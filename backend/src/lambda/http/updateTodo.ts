@@ -4,24 +4,43 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
-import { updateTodo } from '../../businessLogic/todos'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
-import { getUserId } from '../utils'
+import { updateToDo } from '../../service/todosService'
+import { getUserIdFromGatewayEvent, omitUserId } from '../../auth/utils'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('updateTodo')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const todoId = event.pathParameters.todoId
-    const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+    const updatedTodoReq: UpdateTodoRequest = JSON.parse(event.body)
 
-
-    return undefined
+    try {
+      const updatedItem = await updateToDo(
+        todoId,
+        updatedTodoReq,
+        getUserIdFromGatewayEvent(event)
+      )
+      return {
+        statusCode: 200,
+        body: JSON.stringify(
+          {
+            updatedItem: updatedItem
+          },
+          //omit user id from response sent back to the client
+          omitUserId
+        )
+      }
+    } catch (err) {
+      logger.error(err)
+      throw new Error(err)
+    }
+  }
 )
 
-handler
-  .use(httpErrorHandler())
-  .use(
-    cors({
-      credentials: true
-    })
-  )
+handler.use(httpErrorHandler()).use(
+  cors({
+    credentials: true
+  })
+)
