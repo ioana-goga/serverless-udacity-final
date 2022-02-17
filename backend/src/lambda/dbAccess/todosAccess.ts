@@ -13,7 +13,8 @@ export class ToDoAccess {
   constructor(
     private readonly docClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly toDosTable = process.env.TODOS_TABLE,
-    private readonly createdAtIndex = process.env.TODOS_CREATED_AT_INDEX
+    private readonly createdAtIndex = process.env.TODOS_CREATED_AT_INDEX,
+    private readonly todoIdIndex = process.env.TODOS_ID_INDEX
   ) {}
 
   async getAllToDos(userId: string): Promise<TodoItem[]> {
@@ -38,12 +39,12 @@ export class ToDoAccess {
 
   async toDoExists(toDoId: string, userId: string): Promise<Boolean> {
     logger.info('searching for todo by id ' + toDoId)
-    const result = await this.getToDoItem(toDoId, userId)
+    const result = await this.getToDoItemForUser(toDoId, userId)
     logger.info('to do item is : ' + JSON.stringify(result.Item))
     return !!result.Item
   }
 
-  private async getToDoItem(toDoId: string, userId: string) {
+  private async getToDoItemForUser(toDoId: string, userId: string) {
     return await this.docClient
       .get({
         TableName: this.toDosTable,
@@ -53,6 +54,21 @@ export class ToDoAccess {
         }
       })
       .promise()
+  }
+
+  async getToDoItem(todoId: string): Promise<TodoItem> {
+    logger.info('searching for todo by id ' + todoId)
+    const result = await this.docClient
+      .query({
+        TableName: this.toDosTable,
+        IndexName: this.todoIdIndex,
+        KeyConditionExpression: 'todoId = :todoId',
+        ExpressionAttributeValues: {
+          ':todoId': todoId
+        }
+      })
+      .promise()
+    return result.Items[0] as TodoItem
   }
 
   async createToDo(toDoItem: TodoItem): Promise<TodoItem> {
@@ -102,12 +118,41 @@ export class ToDoAccess {
 
       let updatedTodoItem = {} as TodoItem
       if ('Attributes' in response) {
-        logger.info('attributes in response')
         updatedTodoItem = response.Attributes as TodoItem
       }
       return updatedTodoItem
     } catch (err) {
       logger.error('Error on update item ' + err)
+      throw err
+    }
+  }
+
+  async updateToDoAttachmentUrl(
+    toDoId: string,
+    userId: string,
+    attachmentUrl: string
+  ): Promise<Boolean> {
+    const params = {
+      TableName: this.toDosTable,
+      Key: {
+        todoId: toDoId,
+        userId: userId
+      },
+      UpdateExpression: 'set #attachmentUrl = :attachmentUrl',
+      ExpressionAttributeValues: {
+        ':attachmentUrl': attachmentUrl
+      },
+      ExpressionAttributeNames: {
+        '#attachmentUrl': 'attachmentUrl'
+      },
+      ReturnValues: 'ALL_NEW'
+    }
+
+    try {
+      await this.docClient.update(params).promise()
+      return true
+    } catch (err) {
+      logger.error('Error on update attachment url ' + err)
       throw err
     }
   }
@@ -126,7 +171,7 @@ export class ToDoAccess {
         .promise()
       return true
     } catch (err) {
-      logger.error('**** Error on delete item ' + err)
+      logger.error(' Error on delete item ' + err)
       throw err
     }
   }
