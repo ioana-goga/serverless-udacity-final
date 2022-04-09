@@ -1,0 +1,486 @@
+{
+	"info": {
+		"_postman_id": "06d47679-741b-4643-80b4-ffebda8ba663",
+		"name": "Udacity Cloud Final Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "todos",
+			"item": [
+				{
+					"name": "Create todo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"cloths shopping for p1\",\n\t\"dueDate\": \"2019-07-11\",\n    \"projectCreatedAt\":\"2022-03-29T10:09:09.779Z\"\n}"
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/todos",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"todos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update todo",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t   \n            \"dueDate\": \"2019-07-12\",\n            \"name\": \"clothes shopping for p1 updated\",\n            \"done\": true\n\n}"
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/todos/2022-03-29T10:09:09.779Z/2022-04-09T09:04:57.675Z",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"todos",
+								"2022-03-29T10:09:09.779Z",
+								"2022-04-09T09:04:57.675Z"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete todo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/todos/2022-03-29T10:09:09.779Z/2022-03-29T12:00:12.537Z",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"todos",
+								"2022-03-29T10:09:09.779Z",
+								"2022-03-29T12:00:12.537Z"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get todos for project",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/projects/todos/2022-03-29T10:09:09.779Z",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"projects",
+								"todos",
+								"2022-03-29T10:09:09.779Z"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "projects",
+			"item": [
+				{
+					"name": "Get all projects",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/projects?order=name",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"projects"
+							],
+							"query": [
+								{
+									"key": "order",
+									"value": "name"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Project B\",\n\t\"description\": \"This is project B\"\n}"
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/projects",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete project",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/projects/2022-03-29T10:09:59.746Z",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"projects",
+								"2022-03-29T10:09:59.746Z"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update project",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Project 1 \",\n\t\"description\": \"This is Project 1 updated\"\n}"
+						},
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/projects/2022-03-29T10:09:09.779Z",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"projects",
+								"2022-03-29T10:09:09.779Z"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "upload",
+			"item": [
+				{
+					"name": "GenerateUploadURL",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{apiId}}.execute-api.eu-central-1.amazonaws.com/dev/todos/2022-03-29T10:09:09.779Z/2022-04-09T09:00:35.379Z/attachment",
+							"protocol": "https",
+							"host": [
+								"{{apiId}}",
+								"execute-api",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"todos",
+								"2022-03-29T10:09:09.779Z",
+								"2022-04-09T09:00:35.379Z",
+								"attachment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UploadPhoto",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "/C:/Users/ioana/OneDrive/Desktop/bifa.png"
+							}
+						},
+						"url": {
+							"raw": "https://serverless-c4-todo-images-ig-dev.s3.eu-central-1.amazonaws.com/hWCgcxaHERRB8sHGVLz2vXCgVXKkflTw%40clients_2022-03-29T10%3A09%3A09.779Z_2022-04-09T09%3A00%3A35.379Z?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAWKPK7I7EUSVSA7OS%2F20220409%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220409T092518Z&X-Amz-Expires=300&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEFIaDGV1LWNlbnRyYWwtMSJHMEUCIQDnDXgjVyoGxs0w3MPaYlV5nH6Y10XiEB6IPiSf3sj5FAIgSFoXoeNK1gFKb8y0cwda1ag1DJAptsRbUKnw2V1VnN4qwQII6%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARABGgw0MzQ4MjEzNTEzNjkiDE4gJTkZEv4zeVPXpSqVAoZPombuNPEXTLhr3s%2BpeaFWMWW8f8UkKrGPKjfjUz5jidTi5HRfkkG9JiLnJran9HO0bvFPwyeKlg43URVvPa4IzyJBTpF88v%2BGeqDXQoWx1Obl8hCG5jUAVg9eG2U1g7DnvPKYMigR%2Fln3b4nmQPcLINJrw3EfuzXgBMhqgfir%2BTflYltlIX8c0HeLLUPWR%2FMJY3%2FaItK2zN99leFF%2FJ%2FZycZXcLkfzt4sUkl2Mtunlzw7J7ur0u96dxVbjPM9cDB2Ha8wd2cji2bE8pAISJj6gbOuxNF77Q2KtzZuXhgLX%2F40Q5DxeIsw%2F%2Foq2VqRIQdSouRkN9BbtBzNEcH%2BtZGXg2hnGvc6pCa7FEq9qXuKlf9zCT8w%2FqHFkgY6mgHUX8O4cD8GziPqndxWy5V814IlhHcbDpkiz%2F4OGR6jjBkAwqC3Q6giHYJl2Yrrnw8ICKholnNjgwMvIEggdsord%2BnbfIJvwwWjsVADBk0GQUFq2rBX7gnReqkkkGNnApshM3zo8cuzuIwOQhF6TKNzHCUX4hYmJNKIpaCNwHLCYzzxy5kcv5mRtPuwlUbsWFc1E6ZRXooq7E%2F8&X-Amz-Signature=7b03db0cbd84adb8b86f85ee57bd68bb6a7c99fa6de94bc7439f3f53a0b77b1a&X-Amz-SignedHeaders=host",
+							"protocol": "https",
+							"host": [
+								"serverless-c4-todo-images-ig-dev",
+								"s3",
+								"eu-central-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"hWCgcxaHERRB8sHGVLz2vXCgVXKkflTw%40clients_2022-03-29T10%3A09%3A09.779Z_2022-04-09T09%3A00%3A35.379Z"
+							],
+							"query": [
+								{
+									"key": "X-Amz-Algorithm",
+									"value": "AWS4-HMAC-SHA256"
+								},
+								{
+									"key": "X-Amz-Credential",
+									"value": "ASIAWKPK7I7EUSVSA7OS%2F20220409%2Feu-central-1%2Fs3%2Faws4_request"
+								},
+								{
+									"key": "X-Amz-Date",
+									"value": "20220409T092518Z"
+								},
+								{
+									"key": "X-Amz-Expires",
+									"value": "300"
+								},
+								{
+									"key": "X-Amz-Security-Token",
+									"value": "IQoJb3JpZ2luX2VjEFIaDGV1LWNlbnRyYWwtMSJHMEUCIQDnDXgjVyoGxs0w3MPaYlV5nH6Y10XiEB6IPiSf3sj5FAIgSFoXoeNK1gFKb8y0cwda1ag1DJAptsRbUKnw2V1VnN4qwQII6%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARABGgw0MzQ4MjEzNTEzNjkiDE4gJTkZEv4zeVPXpSqVAoZPombuNPEXTLhr3s%2BpeaFWMWW8f8UkKrGPKjfjUz5jidTi5HRfkkG9JiLnJran9HO0bvFPwyeKlg43URVvPa4IzyJBTpF88v%2BGeqDXQoWx1Obl8hCG5jUAVg9eG2U1g7DnvPKYMigR%2Fln3b4nmQPcLINJrw3EfuzXgBMhqgfir%2BTflYltlIX8c0HeLLUPWR%2FMJY3%2FaItK2zN99leFF%2FJ%2FZycZXcLkfzt4sUkl2Mtunlzw7J7ur0u96dxVbjPM9cDB2Ha8wd2cji2bE8pAISJj6gbOuxNF77Q2KtzZuXhgLX%2F40Q5DxeIsw%2F%2Foq2VqRIQdSouRkN9BbtBzNEcH%2BtZGXg2hnGvc6pCa7FEq9qXuKlf9zCT8w%2FqHFkgY6mgHUX8O4cD8GziPqndxWy5V814IlhHcbDpkiz%2F4OGR6jjBkAwqC3Q6giHYJl2Yrrnw8ICKholnNjgwMvIEggdsord%2BnbfIJvwwWjsVADBk0GQUFq2rBX7gnReqkkkGNnApshM3zo8cuzuIwOQhF6TKNzHCUX4hYmJNKIpaCNwHLCYzzxy5kcv5mRtPuwlUbsWFc1E6ZRXooq7E%2F8"
+								},
+								{
+									"key": "X-Amz-Signature",
+									"value": "7b03db0cbd84adb8b86f85ee57bd68bb6a7c99fa6de94bc7439f3f53a0b77b1a"
+								},
+								{
+									"key": "X-Amz-SignedHeaders",
+									"value": "host"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjZYVENyMkdXTUdLV2xDMGFWSGRjRCJ9.eyJpc3MiOiJodHRwczovL2Rldi0zcXlud21rZS51cy5hdXRoMC5jb20vIiwic3ViIjoiaFdDZ2N4YUhFUlJCOHNIR1ZMejJ2WENnVlhLa2ZsVHdAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vZGV2LTNxeW53bWtlLnVzLmF1dGgwLmNvbS9hcGkvdjIvIiwiaWF0IjoxNjQ5NDM2NDgwLCJleHAiOjE2NDk1MjI4ODAsImF6cCI6ImhXQ2djeGFIRVJSQjhzSEdWTHoydlhDZ1ZYS2tmbFR3Iiwic2NvcGUiOiJyZWFkOmNsaWVudF9ncmFudHMgY3JlYXRlOmNsaWVudF9ncmFudHMgZGVsZXRlOmNsaWVudF9ncmFudHMgdXBkYXRlOmNsaWVudF9ncmFudHMgcmVhZDp1c2VycyB1cGRhdGU6dXNlcnMgZGVsZXRlOnVzZXJzIGNyZWF0ZTp1c2VycyByZWFkOnVzZXJzX2FwcF9tZXRhZGF0YSB1cGRhdGU6dXNlcnNfYXBwX21ldGFkYXRhIGRlbGV0ZTp1c2Vyc19hcHBfbWV0YWRhdGEgY3JlYXRlOnVzZXJzX2FwcF9tZXRhZGF0YSByZWFkOnVzZXJfY3VzdG9tX2Jsb2NrcyBjcmVhdGU6dXNlcl9jdXN0b21fYmxvY2tzIGRlbGV0ZTp1c2VyX2N1c3RvbV9ibG9ja3MgY3JlYXRlOnVzZXJfdGlja2V0cyByZWFkOmNsaWVudHMgdXBkYXRlOmNsaWVudHMgZGVsZXRlOmNsaWVudHMgY3JlYXRlOmNsaWVudHMgcmVhZDpjbGllbnRfa2V5cyB1cGRhdGU6Y2xpZW50X2tleXMgZGVsZXRlOmNsaWVudF9rZXlzIGNyZWF0ZTpjbGllbnRfa2V5cyByZWFkOmNvbm5lY3Rpb25zIHVwZGF0ZTpjb25uZWN0aW9ucyBkZWxldGU6Y29ubmVjdGlvbnMgY3JlYXRlOmNvbm5lY3Rpb25zIHJlYWQ6cmVzb3VyY2Vfc2VydmVycyB1cGRhdGU6cmVzb3VyY2Vfc2VydmVycyBkZWxldGU6cmVzb3VyY2Vfc2VydmVycyBjcmVhdGU6cmVzb3VyY2Vfc2VydmVycyByZWFkOmRldmljZV9jcmVkZW50aWFscyB1cGRhdGU6ZGV2aWNlX2NyZWRlbnRpYWxzIGRlbGV0ZTpkZXZpY2VfY3JlZGVudGlhbHMgY3JlYXRlOmRldmljZV9jcmVkZW50aWFscyByZWFkOnJ1bGVzIHVwZGF0ZTpydWxlcyBkZWxldGU6cnVsZXMgY3JlYXRlOnJ1bGVzIHJlYWQ6cnVsZXNfY29uZmlncyB1cGRhdGU6cnVsZXNfY29uZmlncyBkZWxldGU6cnVsZXNfY29uZmlncyByZWFkOmhvb2tzIHVwZGF0ZTpob29rcyBkZWxldGU6aG9va3MgY3JlYXRlOmhvb2tzIHJlYWQ6YWN0aW9ucyB1cGRhdGU6YWN0aW9ucyBkZWxldGU6YWN0aW9ucyBjcmVhdGU6YWN0aW9ucyByZWFkOmVtYWlsX3Byb3ZpZGVyIHVwZGF0ZTplbWFpbF9wcm92aWRlciBkZWxldGU6ZW1haWxfcHJvdmlkZXIgY3JlYXRlOmVtYWlsX3Byb3ZpZGVyIGJsYWNrbGlzdDp0b2tlbnMgcmVhZDpzdGF0cyByZWFkOmluc2lnaHRzIHJlYWQ6dGVuYW50X3NldHRpbmdzIHVwZGF0ZTp0ZW5hbnRfc2V0dGluZ3MgcmVhZDpsb2dzIHJlYWQ6bG9nc191c2VycyByZWFkOnNoaWVsZHMgY3JlYXRlOnNoaWVsZHMgdXBkYXRlOnNoaWVsZHMgZGVsZXRlOnNoaWVsZHMgcmVhZDphbm9tYWx5X2Jsb2NrcyBkZWxldGU6YW5vbWFseV9ibG9ja3MgdXBkYXRlOnRyaWdnZXJzIHJlYWQ6dHJpZ2dlcnMgcmVhZDpncmFudHMgZGVsZXRlOmdyYW50cyByZWFkOmd1YXJkaWFuX2ZhY3RvcnMgdXBkYXRlOmd1YXJkaWFuX2ZhY3RvcnMgcmVhZDpndWFyZGlhbl9lbnJvbGxtZW50cyBkZWxldGU6Z3VhcmRpYW5fZW5yb2xsbWVudHMgY3JlYXRlOmd1YXJkaWFuX2Vucm9sbG1lbnRfdGlja2V0cyByZWFkOnVzZXJfaWRwX3Rva2VucyBjcmVhdGU6cGFzc3dvcmRzX2NoZWNraW5nX2pvYiBkZWxldGU6cGFzc3dvcmRzX2NoZWNraW5nX2pvYiByZWFkOmN1c3RvbV9kb21haW5zIGRlbGV0ZTpjdXN0b21fZG9tYWlucyBjcmVhdGU6Y3VzdG9tX2RvbWFpbnMgdXBkYXRlOmN1c3RvbV9kb21haW5zIHJlYWQ6ZW1haWxfdGVtcGxhdGVzIGNyZWF0ZTplbWFpbF90ZW1wbGF0ZXMgdXBkYXRlOmVtYWlsX3RlbXBsYXRlcyByZWFkOm1mYV9wb2xpY2llcyB1cGRhdGU6bWZhX3BvbGljaWVzIHJlYWQ6cm9sZXMgY3JlYXRlOnJvbGVzIGRlbGV0ZTpyb2xlcyB1cGRhdGU6cm9sZXMgcmVhZDpwcm9tcHRzIHVwZGF0ZTpwcm9tcHRzIHJlYWQ6YnJhbmRpbmcgdXBkYXRlOmJyYW5kaW5nIGRlbGV0ZTpicmFuZGluZyByZWFkOmxvZ19zdHJlYW1zIGNyZWF0ZTpsb2dfc3RyZWFtcyBkZWxldGU6bG9nX3N0cmVhbXMgdXBkYXRlOmxvZ19zdHJlYW1zIGNyZWF0ZTpzaWduaW5nX2tleXMgcmVhZDpzaWduaW5nX2tleXMgdXBkYXRlOnNpZ25pbmdfa2V5cyByZWFkOmxpbWl0cyB1cGRhdGU6bGltaXRzIGNyZWF0ZTpyb2xlX21lbWJlcnMgcmVhZDpyb2xlX21lbWJlcnMgZGVsZXRlOnJvbGVfbWVtYmVycyByZWFkOmVudGl0bGVtZW50cyByZWFkOmF0dGFja19wcm90ZWN0aW9uIHVwZGF0ZTphdHRhY2tfcHJvdGVjdGlvbiByZWFkOm9yZ2FuaXphdGlvbnMgdXBkYXRlOm9yZ2FuaXphdGlvbnMgY3JlYXRlOm9yZ2FuaXphdGlvbnMgZGVsZXRlOm9yZ2FuaXphdGlvbnMgY3JlYXRlOm9yZ2FuaXphdGlvbl9tZW1iZXJzIHJlYWQ6b3JnYW5pemF0aW9uX21lbWJlcnMgZGVsZXRlOm9yZ2FuaXphdGlvbl9tZW1iZXJzIGNyZWF0ZTpvcmdhbml6YXRpb25fY29ubmVjdGlvbnMgcmVhZDpvcmdhbml6YXRpb25fY29ubmVjdGlvbnMgdXBkYXRlOm9yZ2FuaXphdGlvbl9jb25uZWN0aW9ucyBkZWxldGU6b3JnYW5pemF0aW9uX2Nvbm5lY3Rpb25zIGNyZWF0ZTpvcmdhbml6YXRpb25fbWVtYmVyX3JvbGVzIHJlYWQ6b3JnYW5pemF0aW9uX21lbWJlcl9yb2xlcyBkZWxldGU6b3JnYW5pemF0aW9uX21lbWJlcl9yb2xlcyBjcmVhdGU6b3JnYW5pemF0aW9uX2ludml0YXRpb25zIHJlYWQ6b3JnYW5pemF0aW9uX2ludml0YXRpb25zIGRlbGV0ZTpvcmdhbml6YXRpb25faW52aXRhdGlvbnMiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.LfsmXeKbsVnWVjFpmQmmwwRgX5sDOnz2D16YOiNGuQPWkPHVPAN9v5RGGiK_4j6MG7q4kNuAnar4aOV8ZoN1tjVsoJxP-JpDJ_YY_ztBYeN6691yGovSlExVGfl2xauFAh1r1dw62oV3YshoRpRVrgO3T4hMcGdHbkhndRrWDNusaYFZ9KCfPcyp2kGHpjP-eDtk8gU-fTlREOdHr1eDeuXygL0HgfHm9NTxnvpbIikrWu8zxuXpYQwfJv1XNivBh6L6E9ZTq6wLQhbN-YXGjhan0kHma9u1a8zpv-25WZTHfvAgXhRDH2uvxfne7oGUTtRN6rt-FqHOry3Q-Vfp8g",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apiId",
+			"value": "g8t7fmyla9"
+		},
+		{
+			"key": "authToken",
+			"value": ""
+		}
+	]
+}
