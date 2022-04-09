@@ -1,17 +1,20 @@
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-import * as uuid from 'uuid'
 import { ToDoAccess } from '../lambda/dbAccess/todosAccess'
 import { createLogger } from '../utils/logger'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import { generateToDoHashKey, generateToDoRangeKey } from './KeyUtils'
 
 const toDoAccess = new ToDoAccess()
 
-const logger = createLogger('ToDos')
+const logger = createLogger('ToDoService')
 
-export async function getAllToDos(userId: string): Promise<TodoItem[]> {
+export async function getToDosForProject(
+  userId: string,
+  projectCreatedAt: string
+): Promise<TodoItem[]> {
   logger.info(userId)
-  return toDoAccess.getAllToDos(userId)
+  return toDoAccess.getToDosForProject(userId, projectCreatedAt)
 }
 
 export async function createToDo(
@@ -20,12 +23,11 @@ export async function createToDo(
 ): Promise<TodoItem> {
   logger.info(userId)
 
-  const idV = uuid.v4()
-
+  const createdAt = new Date().toISOString()
   return toDoAccess.createToDo({
-    userId: userId,
-    todoId: idV,
-    createdAt: new Date().toISOString(),
+    hashK: generateToDoHashKey(userId, createToDoRequest.projectCreatedAt),
+    rangeK: generateToDoRangeKey(createdAt),
+    createdAt: createdAt,
     name: createToDoRequest.name,
     dueDate: createToDoRequest.dueDate,
     done: false
@@ -33,46 +35,45 @@ export async function createToDo(
 }
 
 export async function updateToDo(
-  toDoId: string,
-  updateTodoRequest: UpdateTodoRequest,
-  userId: string
+  projectCreatedAt: string,
+  todoCreatedAt: string,
+  userId: string,
+  updateTodoRequest: UpdateTodoRequest
 ): Promise<TodoItem> {
-  logger.info('update to do with id ' + toDoId)
-  logger.info('new values ' + JSON.stringify(updateTodoRequest))
-  logger.info(userId)
-  const toDoExists = await toDoAccess.toDoExists(toDoId, userId)
+  logger.info(
+    'update to do with hashK ' +
+      projectCreatedAt +
+      ' todoCreatedAt = ' +
+      todoCreatedAt
+  )
 
-  if (toDoExists) {
-    return await toDoAccess.updateToDo(toDoId, userId, {
+  return toDoAccess.updateToDo(
+    generateToDoHashKey(userId, projectCreatedAt),
+    generateToDoRangeKey(todoCreatedAt),
+    {
       name: updateTodoRequest.name,
       dueDate: updateTodoRequest.dueDate,
-      done: updateTodoRequest.done,
-
-      userId: userId
-    })
-  } else {
-    throw new Error(
-      'ToDoItem to update does not exist in the database. To do item id = ' +
-        toDoId
-    )
-  }
+      done: updateTodoRequest.done
+    }
+  )
 }
 
 export async function deleteToDoItem(
-  toDoId: string,
+  projectCreatedAt: string,
+  todoCreatedAt: string,
   userId: string
 ): Promise<Boolean> {
-  logger.info('delete to do with id ' + toDoId + ' for user  Id = ' + userId)
-  const toDoExists = await toDoAccess.toDoExists(toDoId, userId)
+  logger.info(
+    'delete to do  projectCreatedAt ' +
+      projectCreatedAt +
+      ' todoCreatedAt = ' +
+      todoCreatedAt
+  )
 
-  if (toDoExists) {
-    return await toDoAccess.deleteToDoItem(userId, toDoId)
-  } else {
-    throw new Error(
-      'ToDoItem to delete does not exist in the database. To do item id = ' +
-        toDoId +
-        ' for user  Id = ' +
-        userId
-    )
-  }
+  return toDoAccess.deleteToDoItem(
+    generateToDoHashKey(userId, projectCreatedAt),
+    generateToDoRangeKey(todoCreatedAt)
+  )
 }
+
+

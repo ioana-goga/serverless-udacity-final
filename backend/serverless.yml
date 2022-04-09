@@ -1,7 +1,6 @@
-# TODO: Change the name of the org
 org: ioanag
-app: serverless-todo-app
-service: serverless-todo-app
+app: serverless-todo-final-project
+service: serverless-todo-final-project
 
 plugins:
   - serverless-webpack
@@ -23,12 +22,9 @@ provider:
     lambda: true
     apiGateway: true
 
-  # Use these variables in the functions and resouorces section below. For example,
-  # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
-    TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    TODOS_ID_INDEX: ToDoIdGlobalIndex
+    TODOS_NAME_INDEX: NameGlobalIndex
     ATTACHMENT_S3_BUCKET: serverless-c4-todo-images-ig-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
@@ -54,7 +50,7 @@ functions:
     events:
       - http:
           method: get
-          path: todos
+          path: projects/todos/{projectCreatedAt}
           cors: true
           authorizer: Auth
     iamRoleStatements:
@@ -62,10 +58,6 @@ functions:
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: 'Allow'
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_CREATED_AT_INDEX}
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -89,7 +81,7 @@ functions:
     events:
       - http:
           method: patch
-          path: todos/{todoId}
+          path: todos/{projectCreatedAt}/{todoCreatedAt}
           cors: true
           authorizer: Auth
           request:
@@ -98,7 +90,6 @@ functions:
     iamRoleStatements:
       - Effect: 'Allow'
         Action:
-          - dynamodb:GetItem
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
@@ -107,22 +98,92 @@ functions:
     events:
       - http:
           method: delete
-          path: todos/{todoId}
+          path: todos/{projectCreatedAt}/{todoCreatedAt}
           cors: true
           authorizer: Auth
     iamRoleStatements:
       - Effect: 'Allow'
         Action:
-          - dynamodb:GetItem
           - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+
+  CreateProject:
+    handler: src/lambda/http/createProject.handler
+    events:
+      - http:
+          method: post
+          path: projects
+          cors: true
+          authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(models/create-project-model.json)}
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+
+  GetProjects:
+    handler: src/lambda/http/getProjects.handler
+    events:
+      - http:
+          method: get
+          path: projects
+          cors: true
+          authorizer: Auth
+          request:
+            parameters:
+              querystrings:
+                order: false
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+      - Effect: 'Allow'
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_NAME_INDEX}
+
+  DeleteProject:
+    handler: src/lambda/http/deleteProject.handler
+    events:
+      - http:
+          method: delete
+          path: projects/{projectCreatedAt}
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - dynamodb:Query
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+
+  UpdateProject:
+    handler: src/lambda/http/updateProject.handler
+    events:
+      - http:
+          method: patch
+          path: projects/{projectCreatedAt}
+          cors: true
+          authorizer: Auth
+          request:
+            schemas:
+              application/json: ${file(models/create-project-model.json)}
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
       - http:
-          method: post
-          path: todos/{todoId}/attachment
+          method: get
+          path: todos/{projectCreatedAt}/{todoCreatedAt}/attachment
           cors: true
     iamRoleStatements:
       - Effect: 'Allow'
@@ -145,8 +206,8 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: 'Allow'
         Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_ID_INDEX}
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
 resources:
   Resources:
@@ -161,42 +222,32 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
 
-    # TODO: Create a DynamoDB table with local secondary index and a composite key
     ToDoTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: todoId
+          - AttributeName: hashK
             AttributeType: S
-          - AttributeName: userId
+          - AttributeName: rangeK
             AttributeType: S
-          - AttributeName: createdAt
+          - AttributeName: name
             AttributeType: S
         KeySchema:
-          - AttributeName: userId
+          - AttributeName: hashK
             KeyType: HASH
-          - AttributeName: todoId
+          - AttributeName: rangeK
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
-        LocalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TODOS_NAME_INDEX}
             KeySchema:
-              - AttributeName: userId
+              - AttributeName: hashK
                 KeyType: HASH
-              - AttributeName: createdAt
+              - AttributeName: name
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL # What attributes will be copied to an index
-        GlobalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.TODOS_ID_INDEX}
-            KeySchema:
-              - AttributeName: todoId
-                KeyType: HASH
-            Projection:
-              ProjectionType: INCLUDE # What attributes will be copied to an index
-              NonKeyAttributes:
-                - attachmentUrl
 
     AttachmentsBucket:
       Type: AWS::S3::Bucket

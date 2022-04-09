@@ -5,23 +5,28 @@ import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 import { createLogger } from '../../utils/logger'
 import { getUserIdFromGatewayEvent } from '../../auth/utils'
-import { getToDosForProject } from '../../service/todosService'
+import { getAllProjects } from '../../service/projectService'
 
-const logger = createLogger('getToDos')
+const logger = createLogger('getProjectsHandler')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info(event)
-    const projectCreatedAt = event.pathParameters.projectCreatedAt
+    let orderField = 'default'
+    if (event.queryStringParameters && event.queryStringParameters.order) {
+      orderField = event.queryStringParameters.order
+    }
+
+    logger.info('orderField = ' + orderField)
     try {
-      const toDoItems = await getToDosForProject(
+      const projects = await getAllProjects(
         getUserIdFromGatewayEvent(event),
-        projectCreatedAt
+        orderField
       )
       return {
         statusCode: 200,
         body: JSON.stringify({
-          items: toDoItems
+          items: projects
         })
       }
     } catch (err) {

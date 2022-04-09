@@ -7,14 +7,10 @@
       "type": "string",
       "minLength": 1
     },
-    "dueDate": {
+    "description": {
       "type": "string"
-    },
-    "projectCreatedAt": {
-      "type": "string",
-      "minLength": 1
     }
   },
-  "required": ["name", "dueDate"],
+  "required": ["name", "description"],
   "additionalProperties": false
 }

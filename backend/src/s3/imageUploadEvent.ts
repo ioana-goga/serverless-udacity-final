@@ -9,6 +9,6 @@ export const handler: S3Handler = async (event: S3Event) => {
   for (const record of event.Records) {
     const key = record.s3.object.key
     logger.info('Processing object with key ' + key)
-    await updateTodoImageUrl(key)
+    await updateTodoImageUrl(decodeURIComponent(key))
   }
 }

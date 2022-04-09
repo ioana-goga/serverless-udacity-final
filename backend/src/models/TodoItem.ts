@@ -1,6 +1,6 @@
 export interface TodoItem {
-  userId: string
-  todoId: string
+  rangeK: string
+  hashK: string
   createdAt: string
   name: string
   dueDate: string

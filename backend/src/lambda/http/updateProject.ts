@@ -3,26 +3,30 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
+
 import { createLogger } from '../../utils/logger'
 import { getUserIdFromGatewayEvent } from '../../auth/utils'
-import { getToDosForProject } from '../../service/todosService'
+import { CreateProjectRequest } from '../../requests/CreateProjectRequest'
+import { updateProject } from '../../service/projectService'
 
-const logger = createLogger('getToDos')
+const logger = createLogger('updateProject')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info(event)
     const projectCreatedAt = event.pathParameters.projectCreatedAt
+
+    const updatedTodoReq: CreateProjectRequest = JSON.parse(event.body)
+
     try {
-      const toDoItems = await getToDosForProject(
+      const updatedItem = await updateProject(
+        projectCreatedAt,
+
         getUserIdFromGatewayEvent(event),
-        projectCreatedAt
+        updatedTodoReq
       )
       return {
         statusCode: 200,
-        body: JSON.stringify({
-          items: toDoItems
-        })
+        body: JSON.stringify(updatedItem)
       }
     } catch (err) {
       logger.error(err)

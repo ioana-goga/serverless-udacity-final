@@ -6,31 +6,28 @@ import { cors, httpErrorHandler } from 'middy/middlewares'
 
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { updateToDo } from '../../service/todosService'
-import { getUserIdFromGatewayEvent, omitUserId } from '../../auth/utils'
 import { createLogger } from '../../utils/logger'
+import { getUserIdFromGatewayEvent } from '../../auth/utils'
 
 const logger = createLogger('updateTodo')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const todoId = event.pathParameters.todoId
+    const projectCreatedAt = event.pathParameters.projectCreatedAt
+    const todoCreatedAt = event.pathParameters.todoCreatedAt
+
     const updatedTodoReq: UpdateTodoRequest = JSON.parse(event.body)
 
     try {
       const updatedItem = await updateToDo(
-        todoId,
-        updatedTodoReq,
-        getUserIdFromGatewayEvent(event)
+        projectCreatedAt,
+        todoCreatedAt,
+        getUserIdFromGatewayEvent(event),
+        updatedTodoReq
       )
       return {
         statusCode: 200,
-        body: JSON.stringify(
-          {
-            updatedItem: updatedItem
-          },
-          //omit user id from response sent back to the client
-          omitUserId
-        )
+        body: JSON.stringify(updatedItem)
       }
     } catch (err) {
       logger.error(err)

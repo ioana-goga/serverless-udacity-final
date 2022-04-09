@@ -5,23 +5,23 @@ import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 import { createLogger } from '../../utils/logger'
 import { getUserIdFromGatewayEvent } from '../../auth/utils'
-import { getToDosForProject } from '../../service/todosService'
+import { deleteProjectWithToDos } from '../../service/projectService'
 
-const logger = createLogger('getToDos')
+const logger = createLogger('deleteProjectWithToDos')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info(event)
     const projectCreatedAt = event.pathParameters.projectCreatedAt
+
     try {
-      const toDoItems = await getToDosForProject(
+      const result = await deleteProjectWithToDos(
         getUserIdFromGatewayEvent(event),
         projectCreatedAt
       )
       return {
         statusCode: 200,
         body: JSON.stringify({
-          items: toDoItems
+          result: result
         })
       }
     } catch (err) {

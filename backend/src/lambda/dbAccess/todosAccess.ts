@@ -12,63 +12,35 @@ const logger = createLogger('todoAccess')
 export class ToDoAccess {
   constructor(
     private readonly docClient = new XAWS.DynamoDB.DocumentClient(),
-    private readonly toDosTable = process.env.TODOS_TABLE,
-    private readonly createdAtIndex = process.env.TODOS_CREATED_AT_INDEX,
-    private readonly todoIdIndex = process.env.TODOS_ID_INDEX
+    private readonly toDosTable = process.env.TODOS_TABLE
   ) {}
 
-  async getAllToDos(userId: string): Promise<TodoItem[]> {
-    logger.info('Getting all todos')
+  async getToDosForProject(
+    userId: string,
+    projectCreatedAt: string
+  ): Promise<TodoItem[]> {
+    logger.info('Getting toDo items for project ' + projectCreatedAt)
 
     const result = await this.docClient
       .query({
         TableName: this.toDosTable,
-        IndexName: this.createdAtIndex,
-        KeyConditionExpression: 'userId = :userId',
+
+        KeyConditionExpression:
+          'hashK = :userId and begins_with(rangeK, :toDos) ',
+
         ExpressionAttributeValues: {
-          ':userId': userId
+          ':userId': userId + '#' + projectCreatedAt,
+          ':toDos': 'Todo#'
         },
         //reverse order
         ScanIndexForward: false
       })
       .promise()
 
-    const items = result.Items
-    return items as TodoItem[]
-  }
+    const toDos = result.Items as TodoItem[]
+    logger.info('toDos  =  ' + JSON.stringify(toDos))
 
-  async toDoExists(toDoId: string, userId: string): Promise<Boolean> {
-    logger.info('searching for todo by id ' + toDoId)
-    const result = await this.getToDoItemForUser(toDoId, userId)
-    logger.info('to do item is : ' + JSON.stringify(result.Item))
-    return !!result.Item
-  }
-
-  private async getToDoItemForUser(toDoId: string, userId: string) {
-    return await this.docClient
-      .get({
-        TableName: this.toDosTable,
-        Key: {
-          todoId: toDoId,
-          userId: userId
-        }
-      })
-      .promise()
-  }
-
-  async getToDoItem(todoId: string): Promise<TodoItem> {
-    logger.info('searching for todo by id ' + todoId)
-    const result = await this.docClient
-      .query({
-        TableName: this.toDosTable,
-        IndexName: this.todoIdIndex,
-        KeyConditionExpression: 'todoId = :todoId',
-        ExpressionAttributeValues: {
-          ':todoId': todoId
-        }
-      })
-      .promise()
-    return result.Items[0] as TodoItem
+    return toDos
   }
 
   async createToDo(toDoItem: TodoItem): Promise<TodoItem> {
@@ -88,16 +60,16 @@ export class ToDoAccess {
   }
 
   async updateToDo(
-    toDoId: string,
-    userId: string,
+    hashK: string,
+    rangeK: string,
     toDoItemUpdate: TodoUpdate
   ): Promise<TodoItem> {
-    logger.info('Todo item found in the database. Executing update.')
+    logger.info('Executing update for todo')
     const params = {
       TableName: this.toDosTable,
       Key: {
-        todoId: toDoId,
-        userId: userId
+        hashK: hashK,
+        rangeK: rangeK
       },
       UpdateExpression: 'set #name = :name, #dueDate = :dueDate, #done = :done',
       ExpressionAttributeValues: {
@@ -128,15 +100,15 @@ export class ToDoAccess {
   }
 
   async updateToDoAttachmentUrl(
-    toDoId: string,
-    userId: string,
+    hashK: string,
+    rangeK: string,
     attachmentUrl: string
   ): Promise<Boolean> {
     const params = {
       TableName: this.toDosTable,
       Key: {
-        todoId: toDoId,
-        userId: userId
+        hashK: hashK,
+        rangeK: rangeK
       },
       UpdateExpression: 'set #attachmentUrl = :attachmentUrl',
       ExpressionAttributeValues: {
@@ -157,15 +129,15 @@ export class ToDoAccess {
     }
   }
 
-  async deleteToDoItem(userId: string, toDoItemId: string): Promise<Boolean> {
-    logger.info('delete todo with id = ' + toDoItemId)
+  async deleteToDoItem(hashK: string, rangeK: string): Promise<Boolean> {
+    logger.info('delete todo with hashK  = ' + rangeK + ' rangeK = ' + rangeK)
     try {
       await this.docClient
         .delete({
           TableName: this.toDosTable,
           Key: {
-            todoId: toDoItemId,
-            userId: userId
+            hashK: hashK,
+            rangeK: rangeK
           }
         })
         .promise()
@@ -174,5 +146,17 @@ export class ToDoAccess {
       logger.error(' Error on delete item ' + err)
       throw err
     }
+  }
+
+  async getToDoItem(hashK: string, rangeK: string) {
+    return await this.docClient
+      .get({
+        TableName: this.toDosTable,
+        Key: {
+          hashK: hashK,
+          rangeK: rangeK
+        }
+      })
+      .promise()
   }
 }

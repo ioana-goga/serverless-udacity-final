@@ -2,15 +2,15 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
-import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
-import { createToDo } from '../../service/todosService'
+import { CreateProjectRequest } from '../../requests/CreateProjectRequest'
+import { createProject } from '../../service/projectService'
 import { getUserIdFromGatewayEvent } from '../../auth/utils'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const toDoRequest: CreateTodoRequest = JSON.parse(event.body)
-    const newItem = await createToDo(
-      toDoRequest,
+    const createProjectRequest: CreateProjectRequest = JSON.parse(event.body)
+    const newItem = await createProject(
+      createProjectRequest,
       getUserIdFromGatewayEvent(event)
     )
     return {
