@@ -1,15 +1,15 @@
 
 # Functionality of the application
 
-This application will allow creating/removing/updating/fetching Projects and todo items.
+This application will allow creating/removing/updating/fetching projects and todo items.
 A project can contain multiple todo items.
-A TODO item is always associated to a project and can optionally have an attachment image.
-Each user only has access to TODO items that he/she has created.
+A todo item is always associated to a project and can optionally have an attachment image.
+Each user only has access to the projects and todo items that he/she has created.
 
 # Data model
 
 Only one table is used to store both projects and todo items.
-There are two common columns `hashK` and `rangeK` to store the hask, repectivly range keys for both types of objects.
+There are two common columns `hashK` and `rangeK` to store the hash, repectivly range key for both types of objects.
 
 
 ## Projects
@@ -17,14 +17,14 @@ A project is uniquely identified through the combination of hash key and range k
 
 - `hashK` (string) -  `user_name`
 - `rangeK` (string) - `Project#project_created_at`
-- `createdAt` (string) - date and time when an item was created
+- `createdAt` (string) - date and time when a project was created
 - `name` (string) - name of a project 
 - `description` (string) - name of a project 
 
 ## TODOs
 A todo item is uniquely identified through the combination of hash key and range key
 
-- `hashK` (string) - contains `user_name#project_created_at`
+- `hashK` (string) - `user_name#project_created_at`
 - `rangeK` (string) - `Todo#todo_created_at`
 - `createdAt` (string) - date and time when an item was created
 - `name` (string) - name of a TODO item (e.g. "Change a light bulb")
@@ -58,13 +58,13 @@ A todo item is uniquely identified through the combination of hash key and range
 
 
 
-- `Auth` - this function  implements a custom authorizer for API Gateway that should be added to all other functions.
+- `Auth` - this function  implements a custom authorizer for API Gateway that is added to all other functions.
 
 
-- `GetProjects` - should return all the projects of the authenticated user. The default sort order is by createdAt descending (newest first).
+- `GetProjects` - returns all the projects of the authenticated user. The default sort order is by createdAt descending (newest first).
 The URL accepts an optional query parameter 'order' which in the current version of the implementation supports the value 'name'. In case this parameter is provided, the sort order is by project name ascending.
 
-It should return data that looks like this:
+It returns data that looks like this:
 
 ```json
 {
@@ -84,13 +84,13 @@ It should return data that looks like this:
             "name": "Project B",
             "rangeK": "Project#2022-03-29T10:10:46.566Z"
         }
-  ]
+  	]
+    ]
 }
 ```
 
 - `CreateProject` - creates a new project for a user. 
-
-It receives a new project item to be created in JSON format that looks like this:
+It receives a new project to be created in JSON format that looks like this:
 
 ```json
 {
@@ -99,7 +99,7 @@ It receives a new project item to be created in JSON format that looks like this
 }
 ```
 
-It returns a new project item that looks like this:
+It returns a new project that looks like this:
 
 ```json
 {
@@ -114,9 +114,8 @@ It returns a new project item that looks like this:
 ```
 
 
-- `UpdateProject` - updates a project item created by a current user. 
-
-It receives an object that contains three fields that can be updated in a project item:
+- `UpdateProject` - updates a project item created by a current user. The identifier of an project that should be updated is passed as a URL path parameter. The identifier of a project is the project creation date. 
+It receives an object that contains two fields that can be updated in a project:
 
 ```json
 {
@@ -125,21 +124,17 @@ It receives an object that contains three fields that can be updated in a projec
 }
 ```
 
-The identifier of an project that should be updated is passed as a URL path parameter. The identifier of a project is the project creation date.
+
 
 It returns the updated project.
 
 
-- `DeleteProject` - deletes a project and all its associated todo items. The identifier of an project (project creation date) that should be deleted is passed as a URL path parameter.
-
-It returns the result of the delete operation (true or false).
+- `DeleteProject` - deletes a project and all its associated todo items. The identifier of an project (project creation date) that should be deleted is passed as a URL path parameter. It returns the result of the delete operation (true or false).
 
 
 
 
-- `GetTodos` - should return all TODO items for a project. The project creation date (the identifier of the project) is passed as a URL parameter.
-
-It should return data that looks like this:
+- `GetTodos` - should return all TODO items for a project. The project creation date (the identifier of the project) is passed as a URL parameter. It should return data that looks like this:
 
 ```json
 {
@@ -166,14 +161,12 @@ It should return data that looks like this:
 }
 ```
 
-- `CreateTodo` - creates a new TODO for a project. 
-
-It receives a new TODO item to be created in JSON format that looks like this:
+- `CreateTodo` - creates a new TODO for a project. It receives a new TODO item to be created in JSON format that looks like this:
 
 ```json
 {
-	"name": "cloths shopping for p1",
-	"dueDate": "2019-07-11",
+    "name": "cloths shopping for p1",
+    "dueDate": "2019-07-11",
     "projectCreatedAt":"2022-03-29T10:09:09.779Z"
 }
 ```
@@ -193,9 +186,7 @@ It returns a new TODO item that looks like this:
 }
 ```
 
-- `UpdateTodo` - updates a TODO item created by a current user. A shape of data send by a client application to this function can be found in the `UpdateTodoRequest.ts` file
-
-It receives an object that contains three fields that can be updated in a TODO item:
+- `UpdateTodo` - updates a TODO item created by a current user. A shape of data send by a client application to this function can be found in the `UpdateTodoRequest.ts` file. It receives an object that contains three fields that can be updated in a TODO item:
 
 ```json
 {
@@ -210,7 +201,7 @@ The identifier of an item that should be updated is passed as two URL paths para
 It returns the updated TODO item.
 
 
-- `DeleteTodo` - deletes a TODO item created by a current user. The id of the todo items is passed as two path parameters. The id is composed of the creation date of the project and the creation date of the todo item.
+- `DeleteTodo` - deletes a TODO item created by a current user. The id of the todo item is passed as two path parameters. The id is composed of the creation date of the project and the creation date of the todo item.
 
 It returns the result of the delete operation (true or false).
 
